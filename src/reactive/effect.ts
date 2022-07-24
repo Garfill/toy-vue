@@ -9,7 +9,7 @@ class ReactiveEffect {
   }
   run() {
     activeEffect = this
-    this._fn()
+    return this._fn()
   }
 }
 
@@ -57,4 +57,6 @@ export function notify(target, key) {
 export function effect(fn: EffectFn) {
   const _effect = new ReactiveEffect(fn)
   _effect.run()
+  // 返回runner，手动触发effect
+  return _effect.run.bind(_effect)
 }
