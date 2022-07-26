@@ -3,9 +3,11 @@ interface EffectFn {
 }
 
 class ReactiveEffect {
-  private _fn: EffectFn
-  constructor(fn: EffectFn) {
+  private _fn: EffectFn;
+  public scheduler: any;
+  constructor(fn: EffectFn, scheduler?: any) {
     this._fn = fn;
+    this.scheduler = scheduler
   }
   run() {
     activeEffect = this
@@ -50,12 +52,16 @@ export function notify(target, key) {
   let dep = depsMap.get(key)
   // dep 就是 track 中收集到的所有 effect
   for (const effect of dep) {
-    effect.run()
+    if (effect.scheduler) {
+      effect.scheduler()
+    } else {
+      effect.run()
+    }
   }
 }
 
-export function effect(fn: EffectFn) {
-  const _effect = new ReactiveEffect(fn)
+export function effect(fn: EffectFn, options: any = {}) {
+  const _effect = new ReactiveEffect(fn, options.scheduler)
   _effect.run()
   // 返回runner，手动触发effect
   return _effect.run.bind(_effect)

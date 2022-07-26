@@ -19,4 +19,28 @@ describe('happy path', () => {
     expect(r).toBe('foo')
     expect(next).toBe(4)
   });
+
+  it('schedule', () => {
+    let dummy: any;
+    let run: any;
+    const scheduler = jest.fn(() => {
+      run = runner
+    })
+    const obj = reactive({ foo: 1 })
+    const runner = effect(() => {
+      dummy = obj.foo + 1;
+    }, {
+      scheduler
+    })
+
+    expect(scheduler).not.toHaveBeenCalled()
+    expect(dummy).toBe(2);
+
+    obj.foo++
+    expect(scheduler).toHaveBeenCalledTimes(1)
+    expect(dummy).toBe(2)
+
+    run()
+    expect(dummy).toBe(3)
+  });
 });

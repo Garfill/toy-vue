@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "jest": "jest"
+    "je": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",
