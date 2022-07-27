@@ -1,7 +1,15 @@
 import { notify, track } from "./effect";
+import { VUE_REACTIVE_FLAG } from "./reactive";
 
 function createGetter(isReadonly = false) {
-  return function(target, key) {
+  return function (target, key) {
+    // isReactive/isReadonly 的特殊处理
+    if (key === VUE_REACTIVE_FLAG.IS_REACTIVE) {
+      return !isReadonly
+    } else if (key === VUE_REACTIVE_FLAG.IS_READONLY) {
+      return isReadonly
+    }
+
     const res = Reflect.get(target, key)
     if (!isReadonly) {
       track(target, key)
@@ -10,7 +18,7 @@ function createGetter(isReadonly = false) {
   }
 }
 function createSetter() {
-  return function(target, key, value) {
+  return function (target, key, value) {
     const res = Reflect.set(target, key, value);
     // 触发依赖
     notify(target, key)
