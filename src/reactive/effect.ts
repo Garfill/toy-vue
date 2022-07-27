@@ -1,3 +1,5 @@
+import { extend } from "../share";
+
 interface EffectFn {
   (): any
 }
@@ -5,26 +7,54 @@ interface EffectFn {
 class ReactiveEffect {
   private _fn: EffectFn;
   public scheduler: any;
+  public deps; // 里面存储项是 Set 类型
+  private active: boolean; // 当前是否激活，防止stop多次执行
+  private onStop?: () => void;
   constructor(fn: EffectFn, scheduler?: any) {
     this._fn = fn;
-    this.scheduler = scheduler
+    this.scheduler = scheduler;
+    this.deps = [];
+    this.active = true;
   }
   run() {
     activeEffect = this
     return this._fn()
   }
+  addDep(dep) {
+    this.deps.push(dep)
+  }
+  stop() {
+    if (this.active) {
+      cleanupEffect(this)
+      if (this.onStop) {
+        this.onStop()
+      }
+      this.active = false;
+    }
+  }
+}
+
+/**
+ * 从keyDep的Set中删除特定的effect
+ * @param effect ReactiveEffect
+ */
+function cleanupEffect(effect: any) {
+  effect.deps.forEach(dep => {
+    dep.delete(effect)
+  });
 }
 
 // 当前激活的 effect
 let activeEffect: ReactiveEffect
 
-// 响应式数据的map
+// 响应式数据的map容器
 // targetMap: { target : Map{ key: Set }}
 // Set 是依赖收集的set
 let targetMap = new Map()
 
 /**
- * 收集依赖target对象中的属性key的依赖
+ * 收集依赖
+ * target对象中的属性key的依赖
  * @param target 响应式对象
  * @param key 属性
  */
@@ -39,7 +69,10 @@ export function track(target, key) {
     keyDep = new Set()
     depsMap.set(key, keyDep)
   }
+
+  if (!activeEffect) return; // 单纯的读取reactive值的时候没有activeEffect, 之后再effect过程中才会生成
   keyDep.add(activeEffect)
+  activeEffect.addDep(keyDep)
 }
 
 /**
@@ -62,7 +95,16 @@ export function notify(target, key) {
 
 export function effect(fn: EffectFn, options: any = {}) {
   const _effect = new ReactiveEffect(fn, options.scheduler)
+  extend(_effect, options)
   _effect.run()
   // 返回runner，手动触发effect
-  return _effect.run.bind(_effect)
+  const runner: any = _effect.run.bind(_effect)
+  runner.effect = _effect
+
+  return runner
+}
+
+
+export function stop(runner) {
+  runner.effect.stop()
 }
