@@ -66,7 +66,10 @@ describe('happy path', () => {
 
   it('onStop', () => {
     const obj = reactive({ foo: 1 })
-    const onStop = jest.fn()
+    let count = 0
+    const onStop = jest.fn(() => {
+      count++
+    })
     let dummy = 0;
     const runner = effect(() => {
       dummy = obj.foo + 1;
@@ -74,5 +77,6 @@ describe('happy path', () => {
 
     stop(runner)
     expect(onStop).toBeCalledTimes(1)
+    expect(count).toBe(1)
   });
 });
