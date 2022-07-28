@@ -38,3 +38,7 @@ export function isReactive(target) {
 export function isReadonly(target) {
   return !!target[VUE_REACTIVE_FLAG.IS_READONLY]
 }
+export function isProxy(target) {
+  // 也可以和上面一样用特定标识
+  return isReactive(target) || isReadonly(target)
+}
