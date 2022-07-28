@@ -9,7 +9,7 @@ let activeEffect: ReactiveEffect
 // 当前是否处于可收集依赖的状态
 let shouldTrack: boolean;
 
-class ReactiveEffect {
+export class ReactiveEffect {
   private _fn: EffectFn;
   public scheduler: any;
   public deps; // 里面存储项是 Set 类型
