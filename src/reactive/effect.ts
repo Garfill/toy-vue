@@ -4,6 +4,11 @@ interface EffectFn {
   (): any
 }
 
+// 当前激活的 effect
+let activeEffect: ReactiveEffect
+// 当前是否处于可收集依赖的状态
+let shouldTrack: boolean;
+
 class ReactiveEffect {
   private _fn: EffectFn;
   public scheduler: any;
@@ -17,8 +22,17 @@ class ReactiveEffect {
     this.active = true;
   }
   run() {
+    if (!this.active) {
+      return this._fn()
+    }
+
+    shouldTrack = true // 打开收集依赖的开关
     activeEffect = this
-    return this._fn()
+
+    const result = this._fn();
+    
+    shouldTrack = false // effect的runner之后重新关闭开关，不进行收集
+    return result;
   }
   addDep(dep) {
     this.deps.push(dep)
@@ -42,16 +56,17 @@ function cleanupEffect(effect: any) {
   effect.deps.forEach(dep => {
     dep.delete(effect)
   });
+  effect.deps.length = 0;
 }
-
-// 当前激活的 effect
-let activeEffect: ReactiveEffect
 
 // 响应式数据的map容器
 // targetMap: { target : Map{ key: Set }}
 // Set 是依赖收集的set
 let targetMap = new Map()
 
+function isTracking() {
+  return shouldTrack && activeEffect !== undefined
+}
 /**
  * 收集依赖
  * target对象中的属性key的依赖
@@ -59,6 +74,9 @@ let targetMap = new Map()
  * @param key 属性
  */
 export function track(target, key) {
+  // if (!activeEffect) return; // 单纯的读取reactive值的时候没有activeEffect, 之后再effect过程中才会生成
+  if (!isTracking()) return;
+
   let depsMap = targetMap.get(target)
   if (!depsMap) {
     depsMap = new Map()
@@ -69,11 +87,11 @@ export function track(target, key) {
     keyDep = new Set()
     depsMap.set(key, keyDep)
   }
-
-  if (!activeEffect) return; // 单纯的读取reactive值的时候没有activeEffect, 之后再effect过程中才会生成
+  if (keyDep.has(activeEffect)) return; // 防止重复收集n
   keyDep.add(activeEffect)
   activeEffect.addDep(keyDep)
 }
+
 
 /**
  * 属性key的值更新，通知依赖触发
