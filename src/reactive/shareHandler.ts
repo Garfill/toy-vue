@@ -1,5 +1,6 @@
+import { isObject } from "../share";
 import { notify, track } from "./effect";
-import { VUE_REACTIVE_FLAG } from "./reactive";
+import { reactive, readonly, VUE_REACTIVE_FLAG } from "./reactive";
 
 function createGetter(isReadonly = false) {
   return function (target, key) {
@@ -11,6 +12,13 @@ function createGetter(isReadonly = false) {
     }
 
     const res = Reflect.get(target, key)
+
+    if (isObject(res)) {
+      // 这里可以说是延迟进行响应式初始化
+      // 只有读取的时候才会进行初始化响应式
+      return isReadonly ? readonly(res) : reactive(res)
+    }
+
     if (!isReadonly) {
       track(target, key)
     }
@@ -35,8 +43,9 @@ export const shareProxyHandler = {
   set: cacheSetter,
 }
 
+let cacheReadOnlyGetter = createGetter(true)
 export const readonlyHandler = {
-  get: createGetter(true),
+  get: cacheReadOnlyGetter,
   set(obj, prop, value) {
     console.warn(`You cannot set ${prop} of a readonly Object `, obj)
     return true;
