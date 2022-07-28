@@ -64,7 +64,7 @@ function cleanupEffect(effect: any) {
 // Set 是依赖收集的set
 let targetMap = new Map()
 
-function isTracking() {
+export function isTracking() {
   return shouldTrack && activeEffect !== undefined
 }
 /**
@@ -87,9 +87,13 @@ export function track(target, key) {
     keyDep = new Set()
     depsMap.set(key, keyDep)
   }
-  if (keyDep.has(activeEffect)) return; // 防止重复收集n
-  keyDep.add(activeEffect)
-  activeEffect.addDep(keyDep)
+  trackEffect(keyDep)
+}
+
+export function trackEffect(dep) {
+  if (dep.has(activeEffect)) return; // 防止重复收集
+  dep.add(activeEffect)
+  activeEffect.addDep(dep)
 }
 
 
@@ -102,6 +106,10 @@ export function notify(target, key) {
   let depsMap = targetMap.get(target)
   let dep = depsMap.get(key)
   // dep 就是 track 中收集到的所有 effect
+  notifyEffect(dep)
+}
+
+export function notifyEffect(dep) {
   for (const effect of dep) {
     if (effect.scheduler) {
       effect.scheduler()
