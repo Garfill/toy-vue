@@ -1,8 +1,8 @@
-import { isObject } from "../share";
+import { extend, isObject } from "../share";
 import { notify, track } from "./effect";
 import { reactive, readonly, VUE_REACTIVE_FLAG } from "./reactive";
 
-function createGetter(isReadonly = false) {
+function createGetter(isReadonly = false, shallow = false) {
   return function (target, key) {
     // isReactive/isReadonly 的特殊处理
     if (key === VUE_REACTIVE_FLAG.IS_REACTIVE) {
@@ -12,7 +12,12 @@ function createGetter(isReadonly = false) {
     }
 
     const res = Reflect.get(target, key)
-
+    if (shallow) {
+      // 浅层的，只会对最外层的属性初始化响应式
+      // 里层的属性，拿到就直接返回
+      return res
+    }
+    // 嵌套的数据对象，初始化响应式
     if (isObject(res)) {
       // 这里可以说是延迟进行响应式初始化
       // 只有读取的时候才会进行初始化响应式
@@ -43,7 +48,9 @@ export const shareProxyHandler = {
   set: cacheSetter,
 }
 
-let cacheReadOnlyGetter = createGetter(true)
+
+
+const cacheReadOnlyGetter = createGetter(true)
 export const readonlyHandler = {
   get: cacheReadOnlyGetter,
   set(obj, prop, value) {
@@ -51,3 +58,9 @@ export const readonlyHandler = {
     return true;
   }
 }
+
+
+const shallowReadonlyGetter = createGetter(true, true)
+export const shallowReadonlyHandler = extend({}, readonlyHandler, {
+  get: shallowReadonlyGetter
+})
