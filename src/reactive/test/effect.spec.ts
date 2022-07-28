@@ -59,6 +59,7 @@ describe('happy path', () => {
     obj.foo++
     expect(dummy).toBe(3)
 
+    // stop之后，keyDep的Set里就没有对应的activeEffect，只有通过runner执行来改变值
     runner()
     expect(dummy).toBe(4)
 
