@@ -1,4 +1,4 @@
-import { readonlyHandler, shallowReadonlyHandler, shareProxyHandler } from "./shareHandler";
+import { readonlyHandler, shallowReactiveHandler, shallowReadonlyHandler, shareProxyHandler } from "./shareHandler";
 
 type RawType = object | Array<any>;
 
@@ -9,6 +9,11 @@ type RawType = object | Array<any>;
 
 export function reactive(raw: RawType) {
   const p = createReactiveObject(raw, shareProxyHandler)
+  return p
+}
+
+export function shallowReactive(raw: RawType) {
+  const p = createReactiveObject(raw, shallowReactiveHandler)
   return p
 }
 

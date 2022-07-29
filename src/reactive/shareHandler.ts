@@ -64,3 +64,10 @@ const shallowReadonlyGetter = createGetter(true, true)
 export const shallowReadonlyHandler = extend({}, readonlyHandler, {
   get: shallowReadonlyGetter
 })
+
+
+
+const shallowReactiveGetter = createGetter(false, true)
+export const shallowReactiveHandler = extend({}, shareProxyHandler, {
+  get: shallowReactiveGetter
+})
