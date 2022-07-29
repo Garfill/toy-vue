@@ -13,8 +13,8 @@ export class ReactiveEffect {
   private _fn: EffectFn;
   public scheduler: any;
   public deps; // 里面存储项是 Set 类型
-  private active: boolean; // 当前是否激活，防止stop多次执行
-  private onStop?: () => void;
+  public active: boolean; // 当前是否激活，防止stop多次执行
+  public onStop?: () => void;
   constructor(fn: EffectFn, scheduler?: any) {
     this._fn = fn;
     this.scheduler = scheduler;
@@ -104,6 +104,7 @@ export function trackEffect(dep) {
  */
 export function notify(target, key) {
   let depsMap = targetMap.get(target)
+  if (!depsMap) return;
   let dep = depsMap.get(key)
   // dep 就是 track 中收集到的所有 effect
   notifyEffect(dep)
