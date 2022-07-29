@@ -1,4 +1,4 @@
-import { effect, stop } from '../effect'
+import { effect, recover, stop } from '../effect'
 import { reactive } from '../reactive'
 describe('happy path', () => {
   it('effect', () => {
@@ -63,8 +63,12 @@ describe('happy path', () => {
     runner()
     expect(dummy).toBe(4)
 
-    // obj.foo = 0
-    // expect(dummy).toBe(1)
+
+    obj.foo = 0
+    recover(runner)
+    expect(dummy).toBe(1);
+    obj.foo = 10
+    expect(dummy).toBe(11);
   });
 
   it('onStop', () => {

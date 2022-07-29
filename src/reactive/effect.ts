@@ -46,6 +46,12 @@ export class ReactiveEffect {
       this.active = false;
     }
   }
+  recover() {
+    if (!this.active) {
+      this.active = true;
+      this.run()
+    }
+  }
 }
 
 /**
@@ -134,4 +140,8 @@ export function effect(fn: EffectFn, options: any = {}) {
 
 export function stop(runner) {
   runner.effect.stop()
+}
+
+export function recover(runner) {
+  runner.effect.recover()
 }
