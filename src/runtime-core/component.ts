@@ -22,11 +22,11 @@ function setupStatefulComponent(instance: any) {
 
   if (setup) {
     const setupResult = setup()
-    handleSetupResule(instance, setupResult)
+    handleSetupResult(instance, setupResult)
   }
 }
 
-function handleSetupResule(instance, setupResult: any) {
+function handleSetupResult(instance, setupResult: any) {
   // todo 
 
   if (typeof setupResult === 'object') {
