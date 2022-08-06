@@ -33,9 +33,14 @@ function mountComponent(vnode: any, container: any) {
 }
 
 function setupRenderEffect(instance, container) {
-  const subTree = instance.render(); // 虚拟节点树 vnode
+  const { proxy } = instance
+  // 绑定render的this
+  const subTree = instance.render.call(proxy); // 虚拟节点树 vnode
 
   patch(subTree, container) // 处理完组件类型，生成组件内部的vnode，递归调用patch挂载subTree
+
+  // 当前组件Component在render完成之后
+  instance.vnode.el = subTree.el
 }
 
 function processElement(vnode: any, container: any) {
@@ -45,6 +50,7 @@ function processElement(vnode: any, container: any) {
 function mountElement(vnode: any, container: any) {
   // 创建节点
   let el = document.createElement(vnode.type)
+  vnode.el = el
   let { props, children } = vnode
   // 子节点
   mountChildren(vnode, el)

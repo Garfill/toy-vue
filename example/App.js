@@ -1,10 +1,19 @@
 import { h } from '../lib/esm/toy-vue.esm.js'
+
+window.app = null;
+
 export const App = {
   render() {
-    return h('div', { id: 'root' }, [
-      h('div', {}, 'hello'),
-      h('div', {}, 'toy-vue')
-    ])
+    window.self = this
+    return h(
+      'div',
+      { id: 'root' },
+      this.msg
+      // [
+      //   h('div', {}, 'hello'),
+      //   h('div', {}, 'toy-vue')
+      // ]
+    )
   },
   setup() {
     return {
