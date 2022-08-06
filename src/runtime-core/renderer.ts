@@ -1,3 +1,4 @@
+import { ShapeFlags } from "../../shapeFlags"
 import { isArray, isObject, isString } from "../share/index"
 import { createComponentInstance, setupComponent } from "./component"
 
@@ -15,9 +16,9 @@ function patch(vnode, container) {
   // 处理组件或者element 的 patch
 
   // 处理组件类型
-  if (isString(vnode.type)) {
+  if (vnode.shapeFlag & ShapeFlags.ELEMENT) {
     processElement(vnode, container)
-  } else if (isObject(vnode)) {
+  } else if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
     processComponent(vnode, container)
   }
 }
@@ -65,9 +66,9 @@ function mountElement(vnode: any, container: any) {
 
 function mountChildren(vnode, el) {
   let { children } = vnode
-  if (isString(children)) {
+  if (vnode.shapeFlag & ShapeFlags.TEXT_CHILDREN) {
     el.textContent = children
-  } else if (isArray(children)) {
+  } else if (vnode.shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
     children.forEach(v => {
       patch(v, el)
     });
