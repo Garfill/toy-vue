@@ -1,5 +1,4 @@
 import { ShapeFlags } from "../../shapeFlags"
-import { isArray, isObject, isString } from "../share/index"
 import { createComponentInstance, setupComponent } from "./component"
 
 /**
@@ -52,12 +51,21 @@ function mountElement(vnode: any, container: any) {
   // 创建节点
   let el = document.createElement(vnode.type)
   vnode.el = el
-  let { props, children } = vnode
+  let { props } = vnode
   // 子节点
   mountChildren(vnode, el)
   // 添加 propsData
+
+  // 是否是事件监听函数
+  const isOn = (key: string) => /^on[A-Z]/.test(key)
   for (let key in props) {
-    el.setAttribute(key, props[key])
+    const val = props[key]
+    if (isOn(key)) {
+      const event = key.slice(2).toLowerCase() // 取出事件名
+      el.addEventListener(event, val)
+    } else {
+      el.setAttribute(key, val)
+    }
   }
 
   // 挂载

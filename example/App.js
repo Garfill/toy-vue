@@ -7,7 +7,12 @@ export const App = {
     window.self = this
     return h(
       'div',
-      { id: 'root' },
+      {
+        id: 'root',
+        onClick() {
+          console.log('click')
+        }
+      },
       this.msg
       // [
       //   h('div', {}, 'hello'),
