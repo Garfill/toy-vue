@@ -13,9 +13,13 @@ export function isFunction(value: any)  {
 }
 
 export function isString(value) {
-  return typeof value === 'string'
+  return typeof value === 'string' || typeof value === 'number'
 }
 
 export function isArray(value) {
   return Array.isArray(value)
+}
+
+export function hasOwn(value, key) {
+  return Object.prototype.hasOwnProperty.call(value, key)
 }

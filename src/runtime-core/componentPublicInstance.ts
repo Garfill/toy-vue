@@ -1,11 +1,16 @@
+import { hasOwn } from "../share/index"
+
 const publicInstanceProxyMap = {
   $el: (i) => i.vnode.el
 }
 
 export const PublicInstanceProxyHandlers = {
   get({ _: instance }, key) {
-    if (key in instance.setupState) {
+    if (hasOwn(instance.setupState, key)) {
       return instance.setupState[key]
+    }
+    if (hasOwn(instance.props, key)) {
+      return instance.props[key]
     }
 
     const publicInstanceProxyGetter = publicInstanceProxyMap[key]

@@ -1,4 +1,5 @@
 import { h } from '../lib/esm/toy-vue.esm.js'
+import { Foo } from './Foo.js';
 
 window.app = null;
 
@@ -13,11 +14,7 @@ export const App = {
           console.log('click')
         }
       },
-      this.msg
-      // [
-      //   h('div', {}, 'hello'),
-      //   h('div', {}, 'toy-vue')
-      // ]
+      [h(Foo, { count: 0 })]
     )
   },
   setup() {
