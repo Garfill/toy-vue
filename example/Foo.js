@@ -2,10 +2,19 @@ import { h } from '../lib/esm/toy-vue.esm.js'
 export const Foo = {
   name: "foo",
   render() {
-    return h('div', {}, this.count)
+    const button = h('button', {
+      onClick: this.emitClick
+    }, this.count)
+    return h('div', {}, [button])
   },
-  setup(props) {
-    console.log(props)
+  setup(props, { emit }) {
+    const emitClick = () => {
+      emit('click', 1,2,3)
+      emit('up-click')
+    }
+    return {
+      emitClick,
+    }
   }
 }
 

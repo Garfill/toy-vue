@@ -10,11 +10,17 @@ export const App = {
       'div',
       {
         id: 'root',
-        onClick() {
-          console.log('click')
-        }
       },
-      [h(Foo, { count: 0 })]
+      [h(Foo, { 
+          count: 0,
+          onClick(a,b,c) {
+            console.log('onClick')
+            console.log(a, b, c)
+          },
+          onUpClick() {
+            console.log('onUpClick')
+          }
+         })]
     )
   },
   setup() {

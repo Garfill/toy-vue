@@ -23,3 +23,17 @@ export function isArray(value) {
 export function hasOwn(value, key) {
   return Object.prototype.hasOwnProperty.call(value, key)
 }
+
+export function toHandlerKey(event: string) {
+  return "on" + capitalize(event)
+}
+
+export function capitalize(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+
+const camelizeRE = /-(\w)/g
+export function camelize(string: string) {
+  return string.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''))
+}
