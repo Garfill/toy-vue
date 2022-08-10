@@ -1,5 +1,5 @@
 import { getShapeFlag, ShapeFlags } from "../../shapeFlags"
-import { isArray, isString } from "../share/index"
+import { isArray, isObject, isString } from "../share/index"
 
 /**
  * 创建虚拟节点
@@ -23,5 +23,16 @@ export function creaetVnode(type, props?, children?) {
     vnode.shapeFlag |= ShapeFlags.TEXT_CHILDREN
   }
 
+  normalizeChildren(vnode)
+
   return vnode
+}
+
+function normalizeChildren(vnode) {
+  if (isObject(vnode.children)) {
+    if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+      // 有设置 slot 的组件vnode
+      vnode.shapeFlag |= ShapeFlags.SLOT_CHILDREN
+    }
+  }
 }
