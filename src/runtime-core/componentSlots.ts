@@ -19,8 +19,5 @@ function normalizeSlotChildren(children, slots) {
 }
 
 function normalizeSlot(slot) {
-  if (isString(slot)) {
-    return slot
-  }
   return isArray(slot) ? slot : [slot]
 }

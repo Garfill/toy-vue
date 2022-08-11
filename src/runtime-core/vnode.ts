@@ -1,6 +1,9 @@
 import { getShapeFlag, ShapeFlags } from "../../shapeFlags"
 import { isArray, isObject, isString } from "../share/index"
 
+
+export const Fragment = Symbol('Fragment')
+export const Text = Symbol('Text')
 /**
  * 创建虚拟节点
  * @param type component配置对象
@@ -35,4 +38,8 @@ function normalizeChildren(vnode) {
       vnode.shapeFlag |= ShapeFlags.SLOT_CHILDREN
     }
   }
+}
+
+export function createTextVNode(text: string) {
+  return creaetVnode(Text, {}, text)
 }

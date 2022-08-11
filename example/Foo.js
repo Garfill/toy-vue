@@ -5,7 +5,7 @@ export const Foo = {
     const button = h('button', {
       onClick: this.emitClick
     }, this.count)
-    return h('div', {}, [button])
+    return h('div', { class: 'foo' }, [button])
   },
   setup(props, { emit }) {
     const emitClick = () => {
