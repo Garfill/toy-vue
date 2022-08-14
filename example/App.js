@@ -1,4 +1,4 @@
-import { h, createTextVNode } from '../lib/esm/toy-vue.esm.js'
+import { h, createTextVNode, provide } from '../lib/esm/toy-vue.esm.js'
 import { Bar } from './Bar.js';
 import { Foo } from './Foo.js';
 
@@ -21,12 +21,13 @@ export const App = {
         }),
         h(Bar, {}, {
           header: () => h('div', { class: 'header' }, [createTextVNode('header')]),
-          footer: ({age}) => h('span', { class: 'footer' }, 'footer is ' + age)
+          footer: ({age}) => h('div', { class: 'footer' }, 'footer is ' + age)
         })
       ]
     )
   },
   setup() {
+    provide('provideMsg', 'provideMsg from app')
     return {
       msg: 'hello toy-vue'
     }

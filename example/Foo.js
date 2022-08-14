@@ -1,18 +1,23 @@
-import { h, getCurrentInstance } from '../lib/esm/toy-vue.esm.js'
+import { h, provide } from '../lib/esm/toy-vue.esm.js'
+import { Sun } from './Sun.js'
 export const Foo = {
   name: "foo",
   render() {
     const button = h('button', {
       onClick: this.emitClick
     }, this.count)
-    return h('div', { class: 'foo' }, [button])
+    const sun = h(Sun)
+    return h('div', { class: 'foo' }, [
+      button,
+      sun,
+    ])
   },
   setup(props, { emit }) {
+    provide('provideMsg', 'provideMsg from foo')
     const emitClick = () => {
       emit('click', 1,2,3)
       emit('up-click')
     }
-    console.log('getCurrentInstance()', getCurrentInstance())
     return {
       emitClick,
     }
