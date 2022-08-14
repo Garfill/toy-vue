@@ -1,4 +1,4 @@
-import { h } from '../lib/esm/toy-vue.esm.js'
+import { h, getCurrentInstance } from '../lib/esm/toy-vue.esm.js'
 export const Foo = {
   name: "foo",
   render() {
@@ -12,6 +12,7 @@ export const Foo = {
       emit('click', 1,2,3)
       emit('up-click')
     }
+    console.log('getCurrentInstance()', getCurrentInstance())
     return {
       emitClick,
     }

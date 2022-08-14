@@ -36,8 +36,10 @@ function setupStatefulComponent(instance: any) {
 
   const { setup } = Component
   if (setup) {
+    setCurrentInstance(instance)
     const setupResult = setup(shallowReadonly(instance.props), { emit: instance.emit })
     handleSetupResult(instance, setupResult)
+    setCurrentInstance(null)
   } else {
     finishComponentSetup(instance)
   }
@@ -56,5 +58,14 @@ function finishComponentSetup(instance: any) {
   if (Component.render) {
     instance.render = Component.render; // 优先选择配置对象内的render函数
   }
+}
+
+
+let currentInstance = null;
+function setCurrentInstance(instance) {
+  currentInstance = instance
+}
+export function getCurrentInstance() {
+  return currentInstance
 }
 

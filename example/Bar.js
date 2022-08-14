@@ -1,4 +1,4 @@
-import { h, renderSlot, createTextVNode } from '../lib/esm/toy-vue.esm.js'
+import { h, renderSlot, createTextVNode, getCurrentInstance } from '../lib/esm/toy-vue.esm.js'
 
 export const Bar = {
   name: 'bar',
@@ -8,5 +8,9 @@ export const Bar = {
       createTextVNode('123'),
       renderSlot(this.$slots, 'footer', { age: 28 })
     ])
+  },
+  setup() {
+    console.log('getCurrentInstance()', getCurrentInstance())
+    return {}
   }
 }

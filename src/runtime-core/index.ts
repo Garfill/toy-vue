@@ -1,4 +1,5 @@
 export * from './createApp'
 export * from './h'
 export * from './helpers/renderSlot'
+export * from './component'
 export { createTextVNode } from './vnode'
