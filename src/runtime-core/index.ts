@@ -1,6 +1,6 @@
-export * from './createApp'
 export * from './h'
 export * from './helpers/renderSlot'
 export * from './component'
 export { createTextVNode } from './vnode'
 export { provide, inject } from './apiInject'
+export { createRenderer } from './renderer'

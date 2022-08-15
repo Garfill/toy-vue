@@ -1,4 +1,4 @@
-import { h, inject } from '../lib/esm/toy-vue.esm.js'
+import { h, inject } from '../../lib/esm/toy-vue.esm.js'
 
 export const Sun = {
   name: 'sun',

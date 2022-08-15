@@ -1,4 +1,4 @@
-import { h, createTextVNode, provide } from '../lib/esm/toy-vue.esm.js'
+import { h, createTextVNode, provide } from '../../lib/esm/toy-vue.esm.js'
 import { Bar } from './Bar.js';
 import { Foo } from './Foo.js';
 

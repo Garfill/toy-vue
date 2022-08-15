@@ -1,4 +1,4 @@
-import { h, renderSlot, createTextVNode, inject } from '../lib/esm/toy-vue.esm.js'
+import { h, renderSlot, createTextVNode, inject } from '../../lib/esm/toy-vue.esm.js'
 
 export const Bar = {
   name: 'bar',

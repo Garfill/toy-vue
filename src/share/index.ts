@@ -37,3 +37,5 @@ const camelizeRE = /-(\w)/g
 export function camelize(string: string) {
   return string.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''))
 }
+
+export const isOn = (key: string) => /^on[A-Z]/.test(key)
