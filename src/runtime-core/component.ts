@@ -1,3 +1,4 @@
+import { proxyRefs } from "../reactive";
 import { shallowReadonly } from "../reactive/reactive";
 import { emit } from "./componentEmit";
 import { initProps } from "./componentProps";
@@ -5,16 +6,18 @@ import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 import { initSlots } from "./componentSlots";
 
 export function createComponentInstance(vnode, parent) {
-  console.log('parent', parent)
   const instance = {
     vnode,
     type: vnode.type,
     setupState: {},
+    proxy: null,
     props: Object.create(null),
     emit: () => {},
     slots: Object.create(null),
     parent,
     provides: parent ? parent.provides : {},
+    isMounted: false, // 标识组件是否已挂载
+    subTree: null, // 存储组件节点树
   }
 
   instance.emit = emit.bind(null, instance) as any
@@ -50,7 +53,7 @@ function setupStatefulComponent(instance: any) {
 
 function handleSetupResult(instance, setupResult: any) {
   if (typeof setupResult === 'object') {
-    instance.setupState = setupResult
+    instance.setupState = proxyRefs(setupResult)
   }
   
   finishComponentSetup(instance) // 保证render不为空
