@@ -39,3 +39,5 @@ export function camelize(string: string) {
 }
 
 export const isOn = (key: string) => /^on[A-Z]/.test(key)
+
+export const EMPTY_OBJ = {}

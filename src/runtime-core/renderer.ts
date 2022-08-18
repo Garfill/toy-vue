@@ -1,5 +1,6 @@
 import { ShapeFlags } from "../../shapeFlags"
 import { effect } from "../reactive/effect"
+import { EMPTY_OBJ } from "../share"
 import { createComponentInstance, setupComponent } from "./component"
 import { createAppAPI } from "./createApp"
 import { Fragment, Text } from "./vnode"
@@ -75,12 +76,12 @@ export function createRenderer(options) {
 
 
         // 当前组件Component在render完成之后
-        instance.vnode.el = subTree.el
+        // instance.vnode.el = subTree.el
       }
     })
   }
   
-  function processElement(n1, n2: any, container: any, parentComponent) {
+  function processElement(n1: any, n2: any, container: any, parentComponent) {
     if (!n1) {
       // n1 不存在，也就是null，初始化逻辑
       mountElement(n2, container, parentComponent)
@@ -101,7 +102,7 @@ export function createRenderer(options) {
     // 事件监听函数和设置属性
     for (let key in props) {
       const val = props[key]
-      hostPatchProps(el, key, val)
+      hostPatchProps(el, key, null, val)
       // const isOn = (key: string) => /^on[A-Z]/.test(key)
       // if (isOn(key)) {
       //   const event = key.slice(2).toLowerCase() // 取出事件名
@@ -117,7 +118,11 @@ export function createRenderer(options) {
   }
 
   function patchElement(n1: any, n2: any, container: any) {
-    console.log(arguments)
+    //  更新props
+    let oldProps = n1.props || EMPTY_OBJ
+    let newProps = n2.props || EMPTY_OBJ
+    let el = n2.el = n1.el
+    patchProps(el, oldProps, newProps)
   }
   
   function mountChildren(vnode, el, parentComponent) {
@@ -138,6 +143,30 @@ export function createRenderer(options) {
   function processText(n1, n2: any, container: any) {
     let text = n2.el = document.createTextNode(n2.children)
     container.appendChild(text)
+  }
+
+  function patchProps(el, oldProps, newProps) {
+    console.log('oldProps', oldProps)
+    console.log('newProps', newProps)
+    if (oldProps === newProps) return; // 只有两个 props 不一样才进行patch
+
+    for (let key in newProps) {
+      const prevProp = oldProps[key]
+      const nextProp = newProps[key]
+
+      if (prevProp !== nextProp) {
+        hostPatchProps(el, key, prevProp, nextProp)
+      }
+    }
+
+    if (oldProps === EMPTY_OBJ) return; // 旧 props 为空，没必要循环
+
+    for (let key in oldProps) {
+      // 删除只有旧 props 上的属性
+      if (!(key in newProps)) {
+        hostPatchProps(el, key,  oldProps[key], null)
+      }
+    }
   }
 
 

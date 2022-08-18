@@ -113,7 +113,9 @@ export function notify(target, key) {
   if (!depsMap) return;
   let dep = depsMap.get(key)
   // dep 就是 track 中收集到的所有 effect
-  notifyEffect(dep)
+  if (dep) {
+    notifyEffect(dep)
+  }
 }
 
 export function notifyEffect(dep) {
