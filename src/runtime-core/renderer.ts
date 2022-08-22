@@ -252,8 +252,54 @@ export function createRenderer(options) {
         hostRemove(c1[i].el)
         i++
       }
+    } else {
+      // 中间的乱序对比
+      let s1 = i; // 中间对比的起点
+      let s2 = i;
+      const toBePatch = e2 - s2 + 1; // 新节点列表上需要patch 的个数
+      let patched = 0
+      // 下方的逻辑仅针对 s1-e1 / s2-e2 的区间节点进行处理
+      const keyToNewIndex = new Map()
+      for (let i = s2; i <= e2; i++) {
+        keyToNewIndex.set(c2[i].key, i)
+      }
+
+      for (let i = s1; i <= e1; i++) {
+        const prevChild = c1[i];
+        if (patched >= toBePatch) {
+          // 已经将新列表上所有节点都patch过，旧列表上多出来的可以直接删除
+          hostRemove(prevChild.el)
+          continue
+        }
+        let newIndex;
+        if (prevChild.key != null) {
+          // 旧节点有设置key
+          newIndex = keyToNewIndex.get(prevChild.key)
+        } else {
+          // 旧节点没有设置key，循环判断是否在新的节点列表内
+          for (let j = s2; j <= e2; j++) {
+            if (isSameVNodeType(prevChild, c2[j])) {
+              newIndex = j;
+              break;
+            }
+          }
+        }
+
+        if (newIndex === undefined) {
+          // 没有对应的，直接删除
+          hostRemove(prevChild.el)
+        } else {
+          // 旧节点有对应到新节点列表上的某一个节点
+          patch(prevChild, c2[newIndex], container, parentComponent, null)
+          patched++
+        }
+        
+      }
+
     }
   }
+
+
   function isSameVNodeType(n1: any, n2: any) {
     return (n1.type === n2.type) && (n1.key === n2.key)
   }
