@@ -259,10 +259,16 @@ export function createRenderer(options) {
       const toBePatch = e2 - s2 + 1; // 新节点列表上需要patch 的个数
       let patched = 0
       // 下方的逻辑仅针对 s1-e1 / s2-e2 的区间节点进行处理
-      const keyToNewIndex = new Map()
+      const keyToNewIndex = new Map() // 新列表 key-index 映射
       for (let i = s2; i <= e2; i++) {
         keyToNewIndex.set(c2[i].key, i)
       }
+
+      // 新列表的index在旧列表上的index映射，0代表没有映射
+      const newIndexToOldIndexMap = (new Array(toBePatch)).fill(0)
+
+      let moved = false; // 标记是否需要移动
+      let maxNewIndexSoFar = 0; // 理想的递增子序列应该是后一个比前一个大，如果有小于前一个的，就是有移动
 
       for (let i = s1; i <= e1; i++) {
         const prevChild = c1[i];
@@ -290,12 +296,46 @@ export function createRenderer(options) {
           hostRemove(prevChild.el)
         } else {
           // 旧节点有对应到新节点列表上的某一个节点
+          if (newIndex >= maxNewIndexSoFar) {
+            maxNewIndexSoFar = newIndex
+          } else {
+            moved = true
+          }
+          newIndexToOldIndexMap[newIndex - s2] = i + 1 // 建立index映射，+1 是防止出现为0的情况（新的index -> 旧的index+1）
           patch(prevChild, c2[newIndex], container, parentComponent, null)
           patched++
         }
-        
       }
 
+      // 上面代码patch所有children之后，移动children到对应节点
+      // 计算最长递增子序列
+      // 返回的是 不连续的、但是递增的、子序列 的！！！索引！！也就是最长的递增子序列索引
+      const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap) : [];
+      let j = increasingNewIndexSequence.length - 1;
+      for (let i = toBePatch - 1; i >= 0; i--) {
+        // 新列表中的index
+        const nextIndex = i + s2;
+        const nextChild = c2[nextIndex]
+        const anchor = nextIndex + 1 < l2 ? c2[nextIndex + 1].el : null
+
+        if (newIndexToOldIndexMap[i] === 0) {
+          // 新旧列表 index的map中没有对应的映射关系，视为新建的节点
+          patch(null, nextChild, container, parentComponent, anchor)
+        } else if (moved) {
+          // 只有在需要移动的时候才移动
+          if (j < 0 || i !== increasingNewIndexSequence[j]) {
+            // 移动
+            hostInsert(nextChild.el, container, anchor)
+          } else {
+            j--
+          }
+        }
+
+      }
+      // 理解：就是把原来 0-n 索引顺序结构的子序列
+      // 先缩减成最长递增子序列索引
+      // 然后从后往前对比
+      // 索引不一样的，取出对应索引的新的vnode（已经patch好），插入对应位置，这样就得到完整递增子序列
     }
   }
 
@@ -317,3 +357,45 @@ export function createRenderer(options) {
   }
 }
 
+
+// 最长递增子序列算法
+function getSequence(arr: number[]): number[] {
+  const p = arr.slice();
+  const result = [0];
+  let i, j, u, v, c;
+  const len = arr.length;
+  for (i = 0; i < len; i++) {
+    const arrI = arr[i];
+    if (arrI !== 0) {
+      j = result[result.length - 1];
+      if (arr[j] < arrI) {
+        p[i] = j;
+        result.push(i);
+        continue;
+      }
+      u = 0;
+      v = result.length - 1;
+      while (u < v) {
+        c = (u + v) >> 1;
+        if (arr[result[c]] < arrI) {
+          u = c + 1;
+        } else {
+          v = c;
+        }
+      }
+      if (arrI < arr[result[u]]) {
+        if (u > 0) {
+          p[i] = result[u - 1];
+        }
+        result[u] = i;
+      }
+    }
+  }
+  u = result.length;
+  v = result[u - 1];
+  while (u-- > 0) {
+    result[u] = v;
+    v = p[v];
+  }
+  return result;
+}

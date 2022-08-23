@@ -112,24 +112,24 @@ const isChange = ref(false);
 // a,b,(c,e,d),f,g
 // a,b,(e,c),f,g
 // 中间部分，老的比新的多， 那么多出来的直接就可以被干掉(优化删除逻辑)
-const prevChildren = [
-  h("p", { key: "A" }, "A"),
-  h("p", { key: "B" }, "B"),
-  h("p", { key: "C", id: "c-prev" }, "C"),
-  h("p", { key: "E" }, "E"),
-  h("p", { key: "D" }, "D"),
-  h("p", { key: "F" }, "F"),
-  h("p", { key: "G" }, "G"),
-];
+// const prevChildren = [
+//   h("p", { key: "A" }, "A"),
+//   h("p", { key: "B" }, "B"),
+//   h("p", { key: "C", id: "c-prev" }, "C"),
+//   h("p", { key: "D" }, "D"),
+//   h("p", { key: "E" }, "E"),
+//   h("p", { key: "F" }, "F"),
+//   h("p", { key: "G" }, "G"),
+// ];
 
-const nextChildren = [
-  h("p", { key: "A" }, "A"),
-  h("p", { key: "B" }, "B"),
-  h("p", { key: "E" }, "E"),
-  h("p", { key: "C", id:"c-next" }, "C"),
-  h("p", { key: "F" }, "F"),
-  h("p", { key: "G" }, "G"),
-];
+// const nextChildren = [
+//   h("p", { key: "A" }, "A"),
+//   h("p", { key: "B" }, "B"),
+//   h("p", { key: "E" }, "E"),
+//   h("p", { key: "C", id:"c-next" }, "C"),
+//   h("p", { key: "F" }, "F"),
+//   h("p", { key: "G" }, "G"),
+// ];
 
 // 2 移动 (节点存在于新的和老的里面，但是位置变了)
 
@@ -149,13 +149,13 @@ const nextChildren = [
 // ];
 
 // const nextChildren = [
+//   h("p", { key: "C" }, "C"),
 //   h("p", { key: "A" }, "A"),
 //   h("p", { key: "B" }, "B"),
-//   h("p", { key: "E" }, "E"),
-//   h("p", { key: "C" }, "C"),
 //   h("p", { key: "D" }, "D"),
-//   h("p", { key: "F" }, "F"),
+//   h("p", { key: "E" }, "E"),
 //   h("p", { key: "G" }, "G"),
+//   h("p", { key: "F" }, "F"),
 // ];
 
 // 2.2
@@ -184,6 +184,27 @@ const nextChildren = [
 //   h("p", { key: "F" }, "F"),
 //   h("p", { key: "G" }, "G"),
 // ];
+const prevChildren = [
+  h("p", {}, "A"),
+  h("p", {}, "B"),
+  h("p", {}, "C"),
+  h("p", {}, "D"),
+  h("p", {}, "E"),
+  h("p", {}, "Z"),
+  h("p", {}, "F"),
+  h("p", {}, "G"),
+];
+
+const nextChildren = [
+  h("p", {}, "a"),
+  h("span", {}, "b"),
+  h("span", {}, "c"),
+  h("span", {}, "d"),
+  h("span", {}, "e"),
+  h("span", {}, "f"),
+  h("span", {}, "g"),
+  h("span", {}, "h"),
+];
 
 // 3. 创建新的节点
 // a,b,(c,e),f,g
