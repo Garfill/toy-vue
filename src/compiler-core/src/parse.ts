@@ -15,7 +15,7 @@ export function baseParse(content: string) {
 
 function parseChildren(context) {
   const nodes: any[] = []
-  let node: any
+  let node
   let s = context.source
   if (s.startsWith(openDelimiter)) {
     node = parseInterpolation(context)
@@ -25,11 +25,12 @@ function parseChildren(context) {
     }
   }
 
-
-
-  if (node) {
-    nodes.push(node)
+  if (!node) {
+    // 默认当成普通文本
+    node = parseText(context, context.source.length)
   }
+
+  nodes.push(node)
   return nodes
 }
 
@@ -54,10 +55,12 @@ function parseInterpolation(context) {
 
   // 获取内部文本长度
   const contentLength = closeIndex - openDelimiter.length
-  const content = context.source.slice(0, contentLength).trim()
-
-  // context.source = context.source.slice(contentLength + closeDelimiter.length)
-  advanceBy(context, contentLength + closeDelimiter.length)
+  // const rawContent = context.source.slice(0, contentLength)
+  // // context.source = context.source.slice(contentLength + closeDelimiter.length)
+  // advanceBy(context, contentLength + closeDelimiter.length)
+  const rawContent = parseTextData(context, contentLength)
+  const content = rawContent.trim()
+  advanceBy(context, closeDelimiter.length)
   return {
     type: NodeTypes.INTERPOLATION,
     content: {
@@ -95,5 +98,20 @@ export function parseTag(context, type: TagType) {
     type: NodeTypes.ELEMENT,
     tag
   }
+}
+
+function parseText(context: any, length: number) {
+  const content = parseTextData(context, length)
+  console.log(context.source.length === 0)
+  return {
+    type: NodeTypes.TEXT,
+    content,
+  }
+}
+
+function parseTextData(context, length) {
+  let content = context.source.slice(0, length)
+  advanceBy(context, content.length)
+  return content
 }
 
