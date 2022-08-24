@@ -8,6 +8,7 @@ import { initSlots } from "./componentSlots";
 export function createComponentInstance(vnode, parent) {
   const instance = {
     vnode,
+    next: null, // 待更新的vnode
     type: vnode.type,
     setupState: {},
     proxy: null,
@@ -18,6 +19,7 @@ export function createComponentInstance(vnode, parent) {
     provides: parent ? parent.provides : {},
     isMounted: false, // 标识组件是否已挂载
     subTree: null, // 存储组件节点树
+    update: null, // 组件effect返回的更新函数
   }
 
   instance.emit = emit.bind(null, instance) as any

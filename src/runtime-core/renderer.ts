@@ -2,6 +2,7 @@ import { ShapeFlags } from "../../shapeFlags"
 import { effect } from "../reactive/effect"
 import { EMPTY_OBJ } from "../share"
 import { createComponentInstance, setupComponent } from "./component"
+import { shouldUpdateComponent } from "./componentUpdateUtils"
 import { createAppAPI } from "./createApp"
 import { Fragment, Text } from "./vnode"
 
@@ -48,18 +49,37 @@ export function createRenderer(options) {
     }
   }
 
-  function processComponent(n1, n2: any, container: any, parentComponent: any, anchor) {
-    mountComponent(n2, container, parentComponent, anchor)
+  function processComponent(n1: any, n2: any, container: any, parentComponent: any, anchor) {
+    if (!n1) {
+      // 初始化
+      mountComponent(n2, container, parentComponent, anchor)
+    } else {
+      updateComponent(n1, n2)
+    }
   }
 
   function mountComponent(vnode: any, container: any, parentComponent: any, anchor) {
-    const instance = createComponentInstance(vnode, parentComponent)
+    // 创建组件对象，挂载到vnode上
+    const instance = vnode.component = createComponentInstance(vnode, parentComponent)
     setupComponent(instance)
     setupRenderEffect(instance, container, anchor)
   }
 
+  function updateComponent(n1, n2) {
+    const instance = n2.component = n1.component
+    if (shouldUpdateComponent(n1, n2)) {
+      instance.next = n2 // 赋值待更新节点
+      instance.update()
+    } else {
+      // 不用更新组件视图，直接更新对应属性y
+      n2.el = n1.el
+      instance.vnode = n2
+      instance.next = null
+    }
+  }
+
   function setupRenderEffect(instance, container, anchor) {
-    effect(() => {
+    instance.update = effect(() => {
       // 通过 effect 将 数据和视图绑定
 
       if (!instance.isMounted) {
@@ -74,15 +94,17 @@ export function createRenderer(options) {
         instance.vnode.el = subTree.el
         instance.isMounted = true
       } else {
-        const { proxy } = instance
+        // 需要新的vnode来获取新的props来更新
+        const { proxy, next, vnode } = instance
+        if (next) {
+          // 赋值 vnode 节点el
+          next.el = vnode.el
+          updateComponentPreRender(instance, next)
+        }
         let prevSubTree = instance.subTree
         const subTree = instance.render.call(proxy) // 绑定render的this生成虚拟节点树 vnode
         instance.subTree = subTree // 更新组件的节点树
         patch(prevSubTree, subTree, container, instance, anchor) // 处理完组件类型，生成组件内部的vnode，递归调用patch挂载subTree
-
-
-        // 当前组件Component在render完成之后
-        // instance.vnode.el = subTree.el
       }
     })
   }
@@ -357,6 +379,12 @@ export function createRenderer(options) {
   }
 }
 
+
+function updateComponentPreRender(instance, nextVNode) {
+  instance.vnode = nextVNode
+  instance.next = null
+  instance.props = nextVNode.props
+}
 
 // 最长递增子序列算法
 function getSequence(arr: number[]): number[] {
