@@ -4,6 +4,7 @@ import { EMPTY_OBJ } from "../share"
 import { createComponentInstance, setupComponent } from "./component"
 import { shouldUpdateComponent } from "./componentUpdateUtils"
 import { createAppAPI } from "./createApp"
+import { queueJob } from "./scheduler"
 import { Fragment, Text } from "./vnode"
 
 export function createRenderer(options) {
@@ -30,6 +31,7 @@ export function createRenderer(options) {
    */
   function patch(n1, n2, container, parentComponent, anchor) {
     // 处理组件或者element 的 patch
+    console.log('patch')
     const { type, shapeFlag } = n2
     switch (type) {
       case Fragment:
@@ -105,6 +107,10 @@ export function createRenderer(options) {
         const subTree = instance.render.call(proxy) // 绑定render的this生成虚拟节点树 vnode
         instance.subTree = subTree // 更新组件的节点树
         patch(prevSubTree, subTree, container, instance, anchor) // 处理完组件类型，生成组件内部的vnode，递归调用patch挂载subTree
+      }
+    }, {
+      scheduler() {
+        queueJob(instance.update)
       }
     })
   }

@@ -11,13 +11,14 @@ let shouldTrack: boolean;
 
 export class ReactiveEffect {
   private _fn: EffectFn;
+  public options: any;
   public scheduler: any;
   public deps; // 里面存储项是 Set 类型
   public active: boolean; // 当前是否激活，防止stop多次执行
   public onStop?: () => void;
-  constructor(fn: EffectFn, scheduler?: any) {
+  constructor(fn: EffectFn, options?: any) {
     this._fn = fn;
-    this.scheduler = scheduler;
+    this.scheduler = options?.scheduler;
     this.deps = [];
     this.active = true;
   }

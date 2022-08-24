@@ -9,7 +9,9 @@ class ComputedRefImpl {
     this.getter = getter
     this._effect = new ReactiveEffect(
       getter,
-      this.setDirty.bind(this),
+      {
+        scheduler: this.setDirty.bind(this)
+      }
       // 绑定this，不绑定会指向_effect
     )
   }

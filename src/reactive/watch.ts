@@ -26,7 +26,7 @@ export function watch(source, cb) {
     }
   }
 
-  let effect = new ReactiveEffect(getter, scheduler)
+  let effect = new ReactiveEffect(getter, {scheduler})
 
 
 
