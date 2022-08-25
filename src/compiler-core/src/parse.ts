@@ -1,8 +1,5 @@
 import { NodeTypes } from "./ast"
 
-const openDelimiter = '{{'
-const closeDelimiter = '}}'
-
 const enum TagType {
   START,
   END,
@@ -18,7 +15,7 @@ function parseChildren(context, ancestor) {
   while (!isEnd(context, ancestor)) {
     let node
     let s = context.source
-    if (s.startsWith(openDelimiter)) {
+    if (s.startsWith('{{')) {
       node = parseInterpolation(context)
     } else if (s[0] === '<') {
       if (/[a-z]/i.test(s[1])) {
@@ -51,6 +48,9 @@ function createRoot(children) {
 
 function parseInterpolation(context) {
   // {{message}} -> message
+  const openDelimiter = '{{'
+  const closeDelimiter = '}}'
+
   const closeIndex = context.source.indexOf(closeDelimiter)
   // context.source = context.source.slice(openDelimiter.length)
   advanceBy(context, openDelimiter.length)

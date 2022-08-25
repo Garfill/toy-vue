@@ -1,13 +1,20 @@
 export default function transform(root, options) {
   const context = createTransformContext(root, options)
   // 1. DFS 遍历
-  traverseNode(root, context)
   // 2. 修改对应节点
+  traverseNode(root, context)
+
+  createRootCodegen(root, context);
 
 }
+
+function createRootCodegen(root, context) {
+  root.codegenNode = root.children[0];
+}
+
 function traverseNode(node: any, context) {
   console.log('traverse >>>>', node)
-  const nodeTransform = context.nodeTransform
+  const nodeTransform = context.nodeTransform || []
   for (let i = 0; i < nodeTransform.length; i++) {
     const transform = nodeTransform[i];
     transform(node)
