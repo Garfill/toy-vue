@@ -5,7 +5,7 @@
   "module": "lib/esm/toy-vue.esm.js",
   "license": "MIT",
   "scripts": {
-    "je": "jest",
+    "test": "jest",
     "build": "rollup -c"
   },
   "devDependencies": {
