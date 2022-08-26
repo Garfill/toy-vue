@@ -41,6 +41,7 @@ function createContext(content: string) {
 
 function createRoot(children) {
   return {
+    type: NodeTypes.ROOT,
     children
   }
 }

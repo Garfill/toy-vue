@@ -1,3 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`string 1`] = `"return function rendner(_ctx, _cache) {return 'hello'}"`;
+exports[`codegen interpolation module 1`] = `
+"const {toDisplayString: _toDisplayString} = Vue
+return function rendner(_ctx, _cache) {return _toDisplayString(_ctx.message)}"
+`;
+
+exports[`codegen string 1`] = `
+"
+return function rendner(_ctx, _cache) {return 'hello'}"
+`;
