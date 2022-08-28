@@ -1,4 +1,4 @@
-import { isObject, isString } from "./src/share/index";
+import { isObject, isStringOrNum } from "./src/share/index";
 
 export const enum ShapeFlags {
   ELEMENT = 1,
@@ -11,7 +11,7 @@ export const enum ShapeFlags {
 export function getShapeFlag(value) {
   if (isObject(value)) {
     return ShapeFlags.STATEFUL_COMPONENT
-  } else if(isString(value)) {
+  } else if(isStringOrNum(value)) {
     return ShapeFlags.ELEMENT
   }
 }

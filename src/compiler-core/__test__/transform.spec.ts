@@ -11,7 +11,7 @@ describe('transform', () => {
       }
     }
     transform(ast, {
-      nodeTransform: [plugin]
+      nodeTransforms: [plugin]
     })
 
     const nodeText = ast.children[0].children[0]

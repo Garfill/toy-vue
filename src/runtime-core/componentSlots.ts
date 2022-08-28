@@ -1,5 +1,5 @@
 import { ShapeFlags } from "../../shapeFlags"
-import { isArray, isString } from "../share/index"
+import { isArray, isStringOrNum } from "../share/index"
 
 export function initSlots(instance, children) {
   // instance.$slots = children

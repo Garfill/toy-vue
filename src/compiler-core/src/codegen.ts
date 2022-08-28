@@ -1,5 +1,6 @@
+import { isString } from "../../share"
 import { NodeTypes } from "./ast"
-import { helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers"
+import { CREATE_ELEMENT_VNODE, helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers"
 
 export function generate(ast) {
   const context = createGenerateContext(ast)
@@ -28,12 +29,11 @@ function genFunctionPreamble(ast: any, context) {
   const { push } = context
   const VueBinding = 'Vue'
   const helpers = ast.helpers
-  const aliasHelper = (s) => `${s}: _${s}`
+  const aliasHelper = (s) => `${helperMapName[s]}: _${helperMapName[s]}`
   if (helpers.length) {
     push(`const {${helpers.map(aliasHelper).join(', ')}} = ${VueBinding}`)
   }
   push('\n')
-  console.log(context.code)
 }
 
 function genNode(node, context) {
@@ -46,6 +46,12 @@ function genNode(node, context) {
       break;
     case NodeTypes.SIMPLE_EXPRESSION:
       genExpressionCode(node, context)
+      break;
+    case NodeTypes.ELEMENT:
+      genElementCode(node, context)
+      break;
+    case NodeTypes.COMPOUND_EXPRESSION:
+      genCompoundExpressionCode(node, context)
       break;
     default:
       break;
@@ -82,5 +88,52 @@ function genInterpolationCode(node: any, context: any) {
 function genExpressionCode(node: any, context: any) {
   const { push } = context
   push(node.content)
+}
+
+function genElementCode(node: any, context: any) {
+  const { push, helper } = context
+  const { tag, children, props } = node
+  // 此处的 node ，参照transformElement的vnodeElement，其中的children就是原来的children[0]
+  push(`${helper(CREATE_ELEMENT_VNODE)}(`)
+  // for (let i = 0; i < children.length; i++) {
+  //   const child = children[i];
+  //   genNode(child, context)
+  // }
+  genNodeList(genNullable([tag, props, children]), context)
+  // genNode(children, context)
+  push(')')
+}
+
+function genCompoundExpressionCode(node: any, context: any) {
+  const { push } = context
+  const { children } = node
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    if (isString(child)) {
+      push(child)
+    } else {
+      genNode(child, context)
+    }
+  }
+}
+
+function genNullable(args) {
+  return args.map((arg) => arg ? arg : "null")
+}
+
+function genNodeList(nodes, context) {
+  console.log('nodes>>>>>>>', nodes)
+  const { push } = context
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (isString(node)) {
+      push(node)
+    } else {
+      genNode(node, context)
+    }
+    if (i < nodes.length - 1) {
+      push(', ')
+    }
+  }
 }
 

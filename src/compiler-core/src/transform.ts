@@ -1,5 +1,5 @@
 import { NodeTypes } from "./ast";
-import { helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers";
+import { TO_DISPLAY_STRING } from "./runtimeHelpers";
 
 export default function transform(root, options = {}) {
   const context = createTransformContext(root, options)
@@ -12,20 +12,30 @@ export default function transform(root, options = {}) {
 }
 
 function createRootCodegen(root, context) {
-  root.codegenNode = root.children[0];
+  const child = root.children[0];
+  if (child.type === NodeTypes.ELEMENT) {
+    root.codegenNode = child.codegenNode
+  } else {
+    root.codegenNode = root.children[0];
+  }
+
 }
 
 function traverseNode(node: any, context) {
   console.log('traverse >>>>', node)
-  const nodeTransform = context.nodeTransform || []
-  for (let i = 0; i < nodeTransform.length; i++) {
-    const transform = nodeTransform[i];
-    transform(node)
+  const nodeTransforms = context.nodeTransforms || []
+  const exitFns: any = [] // 复合类型节点需改变ast结构，通过返回函数，延迟执行
+  for (let i = 0; i < nodeTransforms.length; i++) {
+    const transform = nodeTransforms[i];
+    const onExit = transform(node, context)
+    if (onExit) {
+      exitFns.push(onExit)
+    }
   }
 
   switch (node.type) {
     case NodeTypes.INTERPOLATION:
-      context.helper(helperMapName[TO_DISPLAY_STRING])
+      context.helper(TO_DISPLAY_STRING)
       break
     case NodeTypes.ROOT:
     case NodeTypes.ELEMENT:
@@ -34,6 +44,13 @@ function traverseNode(node: any, context) {
     default:
       break
   }
+
+  console.log('traverseEnd, ', node)
+  let i = exitFns.length
+  while (i--) {
+    exitFns[i]()
+  }
+  
 }
 
 function traverseChildren(node: any, context: any) {
@@ -47,7 +64,7 @@ function traverseChildren(node: any, context: any) {
 function createTransformContext(root: any, options: any) {
   const context = {
     root,
-    nodeTransform: options.nodeTransform,
+    nodeTransforms: options.nodeTransforms,
     helpers: new Map(),
     helper(key) {
       context.helpers.set(key, 1)

@@ -13,6 +13,10 @@ export function isFunction(value: any)  {
 }
 
 export function isString(value) {
+  return typeof value === 'string'
+}
+
+export function isStringOrNum(value) {
   return typeof value === 'string' || typeof value === 'number'
 }
 
