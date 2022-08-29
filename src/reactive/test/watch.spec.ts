@@ -1,6 +1,6 @@
 import { reactive } from "../reactive";
 import { ref } from "../ref";
-import { watch } from "../watch";
+import { watch } from "../../runtime-core/watch";
 
 
 describe('watch', () => {

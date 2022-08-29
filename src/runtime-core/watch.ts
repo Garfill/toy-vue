@@ -1,7 +1,7 @@
 import { hasChange } from "../share";
-import { ReactiveEffect } from "./effect";
-import { isReactive } from "./reactive";
-import { isRef } from "./ref"
+import { ReactiveEffect } from "../reactive/effect";
+import { isReactive } from "../reactive/reactive";
+import { isRef } from "../reactive/ref"
 
 export function watch(source, cb) {
   let getter = () => {};
