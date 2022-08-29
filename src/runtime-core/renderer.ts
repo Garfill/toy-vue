@@ -88,7 +88,7 @@ export function createRenderer(options) {
         // 未初始化
         const { proxy } = instance
         // 绑定render的this
-        const subTree = instance.subTree = instance.render.call(proxy) // 虚拟节点树 vnode
+        const subTree = instance.subTree = instance.render.call(proxy, proxy) // 虚拟节点树 vnode
 
         patch(null, subTree, container, instance, anchor) // 处理完组件类型，生成组件内部的vnode，递归调用patch挂载subTree
 
@@ -104,7 +104,7 @@ export function createRenderer(options) {
           updateComponentPreRender(instance, next)
         }
         let prevSubTree = instance.subTree
-        const subTree = instance.render.call(proxy) // 绑定render的this生成虚拟节点树 vnode
+        const subTree = instance.render.call(proxy, proxy) // 绑定render的this生成虚拟节点树 vnode
         instance.subTree = subTree // 更新组件的节点树
         patch(prevSubTree, subTree, container, instance, anchor) // 处理完组件类型，生成组件内部的vnode，递归调用patch挂载subTree
       }

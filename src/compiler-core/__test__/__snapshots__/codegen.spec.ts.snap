@@ -15,11 +15,6 @@ exports[`codegen interpolation module 1`] = `
 return function rendner(_ctx, _cache) {return _toDisplayString(_ctx.message)}"
 `;
 
-exports[`codegen nested 1`] = `
-"const {toDisplayString: _toDisplayString, createElementVNode: _createElementVNode} = Vue
-return function rendner(_ctx, _cache) {return _createElementVNode('div', null, _createElementVNode(p, null, ))}"
-`;
-
 exports[`codegen string 1`] = `
 "
 return function rendner(_ctx, _cache) {return 'hello'}"

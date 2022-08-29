@@ -11,6 +11,7 @@ export const Text = Symbol('Text')
  * @param children 
  * @returns vnode
  */
+export { creaetVnode as createElementVNode }
 export function creaetVnode(type, props?, children?) {
   let vnode: any = {
     type,

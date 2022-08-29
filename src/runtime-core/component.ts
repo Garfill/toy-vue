@@ -63,9 +63,10 @@ function handleSetupResult(instance, setupResult: any) {
 
 function finishComponentSetup(instance: any) {
   const Component = instance.type
-  if (Component.render) {
-    instance.render = Component.render; // 优先选择配置对象内的render函数
+  if (!Component.render && Component.template && compiler) {
+    Component.render = compiler(Component.template)
   }
+  instance.render = Component.render; // 优先选择配置对象内的render函数
 }
 
 
@@ -77,3 +78,8 @@ export function getCurrentInstance() {
   return currentInstance
 }
 
+
+let compiler
+export function registerRuntimeCompiler(_compiler) {
+  compiler = _compiler
+}

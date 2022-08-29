@@ -45,14 +45,4 @@ describe('codegen', () => {
     const { code } = generate(ast);
     expect(code).toMatchSnapshot();
   })
-
-  test('nested', () => {
-    const ast = baseParse("<div><p>{{msg}}</p></div>")
-    transform(ast, {
-      nodeTransforms: [transformExpression, transformElement, transformText]
-    });
-
-    const { code } = generate(ast);
-    expect(code).toMatchSnapshot();
-  })
 })  
