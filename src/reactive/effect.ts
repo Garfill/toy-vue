@@ -59,7 +59,7 @@ export class ReactiveEffect {
  * 从keyDep的Set中删除特定的effect
  * @param effect ReactiveEffect
  */
-function cleanupEffect(effect: any) {
+function  cleanupEffect(effect: any) {
   effect.deps.forEach(dep => {
     dep.delete(effect)
   });
@@ -69,7 +69,7 @@ function cleanupEffect(effect: any) {
 // 响应式数据的map容器
 // targetMap: { target : Map{ key: Set }}
 // Set 是依赖收集的set
-let targetMap = new Map()
+let targetMap = new WeakMap()
 
 export function isTracking() {
   return shouldTrack && activeEffect !== undefined

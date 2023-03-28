@@ -1,25 +1,53 @@
 import { reactive } from "../reactive";
-import { ref } from "../ref";
-import { watch } from "../../runtime-core/watch";
+import { nextTick } from "../../runtime-core";
+import { watchEffect } from "../../runtime-core/watch";
+import { effect } from '../effect';
 
 
-describe('watch', () => {
-  it('happy path', () => {
-    const a = ref(1)
-    const data = reactive({ count: 0 })
-    let newV, oldV
-    watch(a, (oldVal, newVal) => {
-      newV = newVal;
-      oldV = oldVal;
-      data.count++;
+describe("watch", () => {
+  it("effect", async () => {
+    const state = reactive({count: 0})
+    let dummy
+    watchEffect(() => {
+      dummy = state.count
     })
-    a.value = 2
-    expect(oldV).toBe(1);
-    expect(newV).toBe(2);
-    expect(data.count).toBe(1);
-    a.value = 10
-    expect(oldV).toBe(2);
-    expect(newV).toBe(10);
-    expect(data.count).toBe(2);
-  });
-});
+    expect(dummy).toBe(0)
+    state.count++
+    await nextTick()
+    expect(dummy).toBe(1)
+  })
+
+  it('stop watching', async () => {
+    const  state = reactive({ count: 0})
+    let dummy
+    const stop: any = watchEffect(() => {
+      dummy = state.count
+    })
+    expect(dummy).toBe(0)
+
+    stop()
+    state.count++
+    await nextTick()
+    expect(dummy).toBe(0)
+  })
+
+  it("cleanup", async () => {
+    const state = reactive({ count: 0 })
+    let dummy
+    let cleanup = jest.fn()
+
+    const stop = watchEffect((onCleanup) => {
+      onCleanup(cleanup)
+      dummy = state.count
+    })
+    expect(dummy).toBe(0)
+    
+    state.count++
+    await nextTick()
+    expect(cleanup).toHaveBeenCalledTimes(1)
+    expect(dummy).toBe(1)
+
+    stop()
+    expect(cleanup).toHaveBeenCalledTimes(2)
+  })
+})
