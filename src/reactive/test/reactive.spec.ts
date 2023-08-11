@@ -1,3 +1,4 @@
+import { nextTick } from '../../runtime-core';
 import { isProxy, isReactive, reactive } from '../reactive'
 
 describe('reactive', () => {
@@ -24,5 +25,9 @@ describe('reactive', () => {
     expect(isReactive(observed.nested)).toBe(true)
     expect(isReactive(observed.array)).toBe(true)
     expect(isReactive(observed.array[0])).toBe(true)
+
+    const a = observed.nested
+    const b = observed.nested
+    expect(a === b).toBe(true)
   });
 });

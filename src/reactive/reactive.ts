@@ -2,6 +2,8 @@ import { readonlyHandler, shallowReactiveHandler, shallowReadonlyHandler, shareP
 
 type RawType = object | Array<any>;
 
+export const reactiveMap = new WeakMap()
+
  export const enum VUE_REACTIVE_FLAG  {
   IS_REACTIVE = '_v_is_reactive',
   IS_READONLY = '_v_is_readonly',
@@ -30,8 +32,17 @@ export function shallowReadonly(raw: RawType) {
 
 
 function createReactiveObject(target, handlerObject) {
+  if (isReactive(target)) {
+    return target
+  }
+  const existingProxy = reactiveMap.get(target)
+  if (existingProxy) {
+    return existingProxy
+  }
   // 返回proxy拦截对象的get和set
-  return new Proxy(target, handlerObject)
+  const proxy = new Proxy(target, handlerObject)
+  reactiveMap.set(target, proxy)
+  return proxy
 }
 
 

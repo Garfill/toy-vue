@@ -211,7 +211,6 @@ export function createRenderer(options) {
     const prevChildren = n1.children
     const nextChildren = n2.children
 
-    // 新节点是文本
     if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
       // 新的节点是text
       if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
